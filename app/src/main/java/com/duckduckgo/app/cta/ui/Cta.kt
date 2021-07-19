@@ -257,6 +257,38 @@ sealed class DaxBubbleCta(
     )
 }
 
+sealed class BubbleCta(
+    override val ctaId: CtaId,
+    @StringRes open val description: Int,
+    override val shownPixel: Pixel.PixelName?,
+    override val okPixel: Pixel.PixelName?,
+    override val cancelPixel: Pixel.PixelName?,
+) : Cta, ViewCta {
+
+    override fun showCta(view: View) {
+        val daxText = view.context.getString(description)
+        view.show()
+        view.alpha = 1f
+        view.hiddenTextCta.text = daxText.html(view.context)
+        view.primaryCta.hide()
+        view.dialogTextCta.startTypingAnimation(daxText, true)
+    }
+
+    override fun pixelCancelParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelOkParameters(): Map<String, String> = emptyMap()
+
+    override fun pixelShownParameters(): Map<String, String> = emptyMap()
+
+    class DaxFavoritesOnboardingCta() : BubbleCta(
+        CtaId.DAX_FAVORITES_ONBOARDING,
+        R.string.daxFavoritesOnboardingCtaText,
+        AppPixelName.FAVORITES_ONBOARDING_CTA_SHOWN,
+        null,
+        null
+    )
+}
+
 sealed class DaxFireDialogCta(
     override val ctaId: CtaId,
     @StringRes open val description: Int,

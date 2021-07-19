@@ -35,6 +35,7 @@ interface FavoritesRepository {
     fun update(favorite: SavedSite.Favorite)
     fun updateWithPosition(favorites: List<SavedSite.Favorite>)
     fun favorites(): Flow<List<SavedSite.Favorite>>
+    fun userHasFavorites(): Boolean
     suspend fun delete(favorite: SavedSite.Favorite)
 }
 
@@ -61,6 +62,7 @@ class FavoritesDataRepository(
     private val favoritesDao: FavoritesDao,
     private val faviconManager: Lazy<FaviconManager>,
 ) : FavoritesRepository {
+
     override fun favoritesCountByDomain(domain: String): Int {
         return favoritesDao.favoritesCountByUrl(domain)
     }
@@ -95,6 +97,10 @@ class FavoritesDataRepository(
 
     override fun favorites(): Flow<List<SavedSite.Favorite>> {
         return favoritesDao.favorites().distinctUntilChanged().map { favorites -> favorites.mapToSavedSites() }
+    }
+
+    override fun userHasFavorites(): Boolean {
+        return favoritesDao.userHasFavorites()
     }
 
     override suspend fun delete(favorite: SavedSite.Favorite) {
